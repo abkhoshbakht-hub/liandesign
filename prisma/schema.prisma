@@ -1,0 +1,866 @@
+// Phase 1 — Foundation models (User + catalog core).
+// Other entities from the approved schema (orders, payments, reviews,
+// tickets, AI, analytics, integration tables) arrive in later phases
+// via new migrations.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String?
+  email        String   @unique
+  passwordHash   String
+  role           UserRole @default(CUSTOMER)
+  orders         Order[]
+  customizations Customization[]
+  reviews        Review[]
+  tickets        Ticket[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+enum WebsiteStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model WebsiteCategory {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  websites    Website[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Website {
+  id          String          @id @default(cuid())
+  name        String
+  slug        String          @unique
+  description String?
+  basePrice   Int // تومان — قیمت از Backend خوانده می‌شود، نه Hard-code
+  demoUrl     String? // آدرس دموی زنده برای پیش‌نمایش
+  gallery     String[] // تصاویر گالری محصول
+  status      WebsiteStatus   @default(DRAFT)
+  categoryId  String
+  category    WebsiteCategory @relation(fields: [categoryId], references: [id])
+  packages       WebsitePackage[]
+  orderItems     OrderItem[]
+  customizations Customization[]
+  reviews        Review[]
+  sponsoredItems CampaignItem[] @relation("SponsoredWebsites")
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([status])
+  @@index([categoryId])
+}
+
+model WebsitePackage {
+  id        String   @id @default(cuid())
+  name      String
+  price     Int
+  features  String[]
+  websiteId String
+  website   Website  @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  PAID
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+model Order {
+  id        String      @id @default(cuid())
+  number    String      @unique
+  userId    String
+  user      User        @relation(fields: [userId], references: [id])
+  status           OrderStatus @default(PENDING)
+  total            Int // تومان — پس از کسر تخفیف
+  discount         Int               @default(0) // مبلغ تخفیف (تومان)
+  couponCode       String?
+  referralSource   String?
+  referralCampaign String?
+  items            OrderItem[]
+  payment   Payment?
+  invoice   Invoice?
+  refunds   Refund[]
+  attempts  PaymentAttempt[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+model OrderItem {
+  id          String   @id @default(cuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  websiteId   String?
+  website     Website? @relation(fields: [websiteId], references: [id])
+  productId   String?
+  product     Product? @relation(fields: [productId], references: [id])
+  packageName String
+  price       Int // تومان — snapshot لحظه خرید
+  config      Json? // کانفیگ شخصی‌سازی (فاز ۴ پر می‌شود)
+}
+
+// ── فروشگاه دیجیتال (فاز ۷) ──
+
+model ProductCategory {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id          String          @id @default(cuid())
+  name        String
+  slug        String          @unique
+  description String?
+  price       Int // تومان
+  fileUrl     String? // لینک فایل تحویلی (مدیر بارگذاری می‌کند)
+  status      WebsiteStatus   @default(DRAFT)
+  categoryId  String
+  category    ProductCategory @relation(fields: [categoryId], references: [id])
+  orderItems  OrderItem[]
+  downloads   Download[]
+  reviews     Review[]
+  sponsoredItems CampaignItem[] @relation("SponsoredProducts")
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([status])
+  @@index([categoryId])
+}
+
+model Download {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderId   String?
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId, orderId])
+  @@index([userId])
+}
+
+model Payment {
+  id        String      @id @default(cuid())
+  orderId   String      @unique
+  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider  String      @default("manual") // Gateway واقعی بعداً وصل می‌شود
+  status    OrderStatus @default(PENDING)
+  amount    Int // تومان
+  reference String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model Invoice {
+  id        String   @id @default(cuid())
+  orderId   String   @unique
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  number    String   @unique
+  total     Int // تومان
+  createdAt DateTime @default(now())
+}
+
+enum CustomizationOptionType {
+  COLOR
+  FONT
+  PAGE
+  FEATURE
+}
+
+// کاتالوگ گزینه‌های شخصی‌سازی — قیمت‌ها از Backend خوانده می‌شوند
+model CustomizationOption {
+  id         String                  @id @default(cuid())
+  key        String                  @unique // مثل primaryColor
+  label      String // مثل «رنگ اصلی»
+  type       CustomizationOptionType
+  choices    Json // [{value, label, priceDelta}]
+  active     Boolean                 @default(true)
+  createdAt  DateTime                @default(now())
+  updatedAt  DateTime                @updatedAt
+}
+
+// کانفیگ ذخیره‌شده هر کاربر برای هر سایت
+model Customization {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  websiteId String
+  website   Website  @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  values    Json // {key: value}
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, websiteId])
+  @@index([websiteId])
+}
+
+// ── اکوسیستم: اتصال به سرویس‌های خارجی (فقط ارجاع؛ دکتر سایت جای دیگری ساخته شده) ──
+
+model ExternalService {
+  id      String                  @id @default(cuid())
+  key     String                  @unique // مثل doctor-site
+  name    String
+  baseUrl String // از env خوانده می‌شود، اینجا فقط رکورد مرجع است
+  active  Boolean                 @default(true)
+  configs ExternalServiceConfig[]
+  refs    ExternalReference[]
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+}
+
+model ExternalServiceConfig {
+  id        String          @id @default(cuid())
+  serviceId String
+  service   ExternalService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  key       String
+  value     String
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  @@unique([serviceId, key])
+}
+
+model ExternalReference {
+  id         String          @id @default(cuid())
+  serviceId  String
+  service    ExternalService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  websiteId  String?
+  externalId String? // شناسه متناظر در سرویس خارجی (وقتی API آمد)
+  kind       String // مثل audit-link
+  createdAt  DateTime        @default(now())
+
+  @@index([serviceId])
+  @@index([websiteId])
+}
+
+model IntegrationLog {
+  id        String   @id @default(cuid())
+  direction String // outbound | inbound
+  source    String? // مثل lian-design
+  campaign  String? // مثل redesign
+  websiteId String?
+  userId    String?
+  createdAt DateTime @default(now())
+
+  @@index([direction])
+  @@index([createdAt])
+}
+
+// ── نظرات، کوپن، تیکت (فاز ۷) ──
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Review {
+  id        String       @id @default(cuid())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  websiteId String?
+  website   Website?     @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  productId String?
+  product   Product?     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  rating    Int // ۱ تا ۵
+  comment   String
+  verified  Boolean      @default(false) // خرید تأییدشده
+  status    ReviewStatus @default(PENDING)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([websiteId])
+  @@index([productId])
+  @@index([status])
+}
+
+model Coupon {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  percent   Int // ۱ تا ۹۰
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum TicketStatus {
+  OPEN
+  CLOSED
+}
+
+model Ticket {
+  id        String       @id @default(cuid())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject   String
+  status    TicketStatus @default(OPEN)
+  messages  TicketMessage[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+model TicketMessage {
+  id        String   @id @default(cuid())
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  userId    String
+  isStaff   Boolean  @default(false)
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([ticketId])
+}
+
+// ── یابنده هوشمند (فاز ۶ — بدون API خارجی؛ rule-based شفاف) ──
+
+model AIConversation {
+  id              String             @id @default(cuid())
+  userId          String?
+  prompt          String
+  intent          Json?
+  recommendations AIRecommendation[]
+  createdAt       DateTime           @default(now())
+
+  @@index([userId])
+}
+
+model AIRecommendation {
+  id             String         @id @default(cuid())
+  conversationId String
+  conversation   AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  websiteId      String
+  score          Int
+  reasons        String[]
+  createdAt      DateTime       @default(now())
+
+  @@index([conversationId])
+}
+
+// ── آنالیتیکس محصول (بخش ۴۰ پرامپت) ──
+
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  name      String // مثل website_view
+  props     Json?
+  userId    String?
+  createdAt DateTime @default(now())
+
+  @@index([name])
+  @@index([createdAt])
+}
+
+// ── تبلیغات و درآمدزایی (فاز ۱ پرامپت تبلیغات) ──
+
+enum CampaignStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  PRE_ACCEPTED
+  PAYMENT_PENDING
+  PAYMENT_RECEIVED
+  FINAL_APPROVAL_PENDING
+  FINAL_APPROVED
+  EFFECTIVE
+  SCHEDULED
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+  REFUNDED
+  REJECTED
+}
+
+enum PricingModel {
+  CPM
+  CPC
+  CPL
+  CPA
+  FIXED_TIME
+  FIXED_IMPRESSIONS
+  ROTATION
+  EXCLUSIVE
+  PACKAGE
+  CUSTOM_QUOTE
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String?
+  email     String?
+  address   String?
+  advertisers AdvertiserProfile[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AdvertiserProfile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  company   String?
+  phone     String?
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  campaigns Campaign[]
+  credits   AdvertisingCredit[]
+  subscriptions AdvertiserSubscription[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AdPlacement {
+  id          String   @id @default(cuid())
+  key         String   @unique // homepage.hero
+  name        String
+  description String?
+  active      Boolean  @default(true)
+  exclusive   Boolean  @default(false) // فقط با خرید صریح انحصار
+  inventories AdInventory[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AdInventory {
+  id          String   @id @default(cuid())
+  placementId String
+  placement   AdPlacement @relation(fields: [placementId], references: [id], onDelete: Cascade)
+  period      String // 2026-09 — ظرفیت ماهانه
+  capacity    Int
+  allocated   Int      @default(0)
+  overbooking Boolean  @default(false)
+  allocations InventoryAllocation[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([placementId, period])
+  @@index([placementId])
+}
+
+model InventoryAllocation {
+  id          String      @id @default(cuid())
+  inventoryId String
+  inventory   AdInventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  campaignId  String
+  campaign    Campaign    @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  amount      Int
+  createdAt   DateTime    @default(now())
+
+  @@index([inventoryId])
+  @@index([campaignId])
+}
+
+model Campaign {
+  id           String         @id @default(cuid())
+  advertiserId String
+  advertiser   AdvertiserProfile @relation(fields: [advertiserId], references: [id], onDelete: Cascade)
+  title        String
+  status       CampaignStatus @default(DRAFT)
+  pricingModel PricingModel   @default(CPM)
+  budget       Int            @default(0) // تومان
+  dailyBudget  Int?
+  startsAt     DateTime?
+  endsAt       DateTime?
+  priority     Int            @default(0)
+  note         String? // توضیح درخواست (کوت سفارشی)
+  orderId      String? // لینک به Order پرداخت — نه ادغام
+  items        CampaignItem[]
+  allocations  InventoryAllocation[]
+  creatives    Creative[]
+  contracts    AdvertisingContract[]
+  targeting    TargetingRule[]
+  caps         FrequencyCap[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([advertiserId])
+  @@index([status])
+}
+
+model CampaignItem {
+  id          String   @id @default(cuid())
+  campaignId  String
+  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  placementId String
+  kind        String // DISPLAY | SPONSORED_WEBSITE | FEATURED_WEBSITE | SPONSORED_PRODUCT | FEATURED_PRODUCT | BOOST | SPONSORED_SEARCH | CATEGORY_SPONSOR
+  websiteId   String?
+  website     Website? @relation("SponsoredWebsites", fields: [websiteId], references: [id])
+  productId   String?
+  product     Product? @relation("SponsoredProducts", fields: [productId], references: [id])
+  categoryId  String? // برای CATEGORY_SPONSOR (id دسته‌بندی سایت)
+  keyword     String? // برای SPONSORED_SEARCH
+  bid         Int? // پیشنهاد CPC (تومان) برای SPONSORED_SEARCH
+  price       Int      @default(0) // تومان
+  createdAt   DateTime @default(now())
+
+  @@index([campaignId])
+}
+
+model PricingRule {
+  id        String   @id @default(cuid())
+  key       String   @unique // base_cpm
+  label     String
+  value     Int // تومان
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PricingFactor {
+  id        String   @id @default(cuid())
+  key       String   @unique // placement_homepage_hero
+  label     String
+  factor    Float    @default(1)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TargetingRule {
+  id         String   @id @default(cuid())
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  type       String // CATEGORY | DEVICE | TIME | SEGMENT
+  value      String
+  createdAt  DateTime @default(now())
+
+  @@index([campaignId])
+}
+
+model FrequencyCap {
+  id         String   @id @default(cuid())
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  scope      String   @default("CAMPAIGN") // CAMPAIGN | CREATIVE | PLACEMENT
+  limit      Int
+  period     String   @default("DAY")
+  createdAt  DateTime @default(now())
+
+  @@index([campaignId])
+}
+
+model Creative {
+  id         String   @id @default(cuid())
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  kind       String   @default("IMAGE") // IMAGE | HTML
+  fileUrl    String?
+  html       String?
+  linkUrl    String?
+  width      Int?
+  height     Int?
+  status     String   @default("DRAFT") // DRAFT | PENDING | APPROVED | REJECTED
+  versions   CreativeVersion[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([campaignId])
+}
+
+model CreativeVersion {
+  id         String   @id @default(cuid())
+  creativeId String
+  creative   Creative @relation(fields: [creativeId], references: [id], onDelete: Cascade)
+  fileUrl    String?
+  version    Int      @default(1)
+  createdAt  DateTime @default(now())
+
+  @@index([creativeId])
+}
+
+model PolicyVersion {
+  id        String   @id @default(cuid())
+  version   String   @unique // v1
+  title     String
+  body      String
+  active    Boolean  @default(true)
+  contracts AdvertisingContract[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AdvertisingContract {
+  id              String   @id @default(cuid())
+  campaignId      String
+  campaign        Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  policyId        String?
+  policy          PolicyVersion? @relation(fields: [policyId], references: [id])
+  preAcceptedAt   DateTime?
+  finalApprovedAt DateTime?
+  approvalMethod  String?
+  versions        ContractVersion[]
+  amendments      ContractAmendment[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([campaignId])
+}
+
+model ContractVersion {
+  id          String   @id @default(cuid())
+  contractId  String
+  contract    AdvertisingContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  version     Int      @default(1)
+  snapshots   ContractSnapshot[]
+  acceptances ContractAcceptance[]
+  createdAt   DateTime @default(now())
+
+  @@index([contractId])
+}
+
+model ContractSnapshot {
+  id        String   @id @default(cuid())
+  versionId String
+  version   ContractVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  payload   Json
+  hash      String
+  final     Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([versionId])
+}
+
+model ContractAmendment {
+  id         String   @id @default(cuid())
+  contractId String
+  contract   AdvertisingContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  summary    String
+  changes    Json?
+  createdBy  String?
+  createdAt  DateTime @default(now())
+
+  @@index([contractId])
+}
+
+enum RefundStatus {
+  REQUESTED
+  APPROVED
+  PROCESSING
+  COMPLETED
+  REJECTED
+}
+
+model Refund {
+  id        String       @id @default(cuid())
+  orderId   String
+  order     Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  amount    Int // تومان
+  status    RefundStatus @default(REQUESTED)
+  reason    String?
+  createdBy String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([orderId])
+  @@index([status])
+}
+
+model PaymentAttempt {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  reference String?
+  status    String   @default("PENDING")
+  payload   Json?
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+}
+
+model ContractAcceptance {
+  id        String   @id @default(cuid())
+  versionId String
+  version   ContractVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  userId    String
+  kind      String // PRE | FINAL
+  method    String?
+  createdAt DateTime @default(now())
+
+  @@index([versionId])
+}
+
+model AdvertisingCredit {
+  id           String   @id @default(cuid())
+  advertiserId String
+  advertiser   AdvertiserProfile @relation(fields: [advertiserId], references: [id], onDelete: Cascade)
+  amount       Int // تومان
+  used         Int      @default(0)
+  expiresAt    DateTime?
+  createdAt    DateTime @default(now())
+
+  @@index([advertiserId])
+}
+
+model CampaignPackage {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  price       Int // تومان
+  items       Json // [{placement, kind}]
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AdvertisingService {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  price       Int // تومان
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AdvertiserSubscription {
+  id           String   @id @default(cuid())
+  advertiserId String
+  advertiser   AdvertiserProfile @relation(fields: [advertiserId], references: [id], onDelete: Cascade)
+  plan         String // PRO | ENTERPRISE
+  active       Boolean  @default(false) // فاز بعد فعال می‌شود
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([advertiserId])
+}
+
+model ImpressionEvent {
+  id           String   @id @default(cuid())
+  campaignId   String?
+  placementKey String
+  ip           String?
+  suspicious   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  @@index([campaignId])
+  @@index([placementKey])
+  @@index([createdAt])
+}
+
+model ClickEvent {
+  id           String   @id @default(cuid())
+  campaignId   String?
+  placementKey String
+  ip           String?
+  suspicious   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  @@index([campaignId])
+  @@index([placementKey])
+  @@index([createdAt])
+}
+
+model ConversionEvent {
+  id         String   @id @default(cuid())
+  campaignId String?
+  kind       String   @default("generic")
+  createdAt  DateTime @default(now())
+
+  @@index([campaignId])
+}
+
+model BlogCategory {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  posts       BlogPost[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model BlogPost {
+  id         String         @id @default(cuid())
+  title      String
+  slug       String         @unique
+  excerpt    String?
+  body       String
+  author     String         @default("تیم لیان دیزاین")
+  status     WebsiteStatus  @default(DRAFT)
+  categoryId String
+  category   BlogCategory   @relation(fields: [categoryId], references: [id])
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  @@index([status])
+  @@index([categoryId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  body      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  action    String
+  entity    String?
+  entityId  String?
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([createdAt])
+}
+
+model SecurityEvent {
+  id        String   @id @default(cuid())
+  kind      String
+  detail    String?
+  createdAt DateTime @default(now())
+
+  @@index([kind])
+  @@index([createdAt])
+}
+
+// ── چت‌بات هوشمند ──
+model ChatMessage {
+  id        String   @id @default(cuid())
+  sessionId String
+  role      String   // "user" | "bot" | "admin"
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([createdAt])
+}

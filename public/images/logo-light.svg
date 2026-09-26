@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100" fill="none">
+  <defs>
+    <linearGradient id="cyan1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00F5D4"/>
+      <stop offset="100%" stop-color="#0EA5E9"/>
+    </linearGradient>
+    <linearGradient id="gold1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFB703"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(10, 5)">
+    <path d="M30 65 C50 30, 85 15, 120 40" stroke="url(#gold1)" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <circle cx="30" cy="65" r="5" fill="#FFB703"/>
+    <circle cx="120" cy="40" r="5" fill="#F59E0B"/>
+    <path d="M40 75 C60 40, 95 25, 130 50" stroke="url(#cyan1)" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <circle cx="40" cy="75" r="5" fill="#00F5D4"/>
+    <circle cx="130" cy="50" r="5" fill="#0EA5E9"/>
+    <path d="M50 55 C70 20, 105 5, 140 30" stroke="url(#gold1)" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <circle cx="50" cy="55" r="5" fill="#FFB703"/>
+    <circle cx="140" cy="30" r="5" fill="#FFB703"/>
+  </g>
+  <text x="180" y="55" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="bold" fill="#FFB703" text-anchor="middle">LIAN</text>
+  <text x="180" y="55" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="bold" fill="#00F5D4" text-anchor="middle" dx="50">DESIGN</text>
+  <text x="180" y="82" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#94a3b8" text-anchor="middle">لیان دیزاین</text>
+</svg>

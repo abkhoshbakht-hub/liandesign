@@ -1,0 +1,18 @@
+# Local PostgreSQL for development (Phase 1).
+# Production uses Neon (free tier) — same DATABASE_URL shape.
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: lian-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lian
+      POSTGRES_PASSWORD: lian_dev_password
+      POSTGRES_DB: liandesign
+    ports:
+      - "5432:5432"
+    volumes:
+      - lian-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  lian-postgres-data:

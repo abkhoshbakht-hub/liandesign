@@ -1,0 +1,60 @@
+{
+  "nav": {
+    "home": "Home",
+    "services": "Services",
+    "allServices": "All Services",
+    "wordpress": "WordPress Development",
+    "custom": "Custom Development",
+    "ecommerce": "E-commerce",
+    "seo": "SEO Services",
+    "bushehr": "Web Design in Bushehr",
+    "orderBushehr": "Order Website in Bushehr",
+    "portfolioBushehr": "Portfolio in Bushehr",
+    "pricingBushehr": "Pricing in Bushehr",
+    "portfolio": "Portfolio",
+    "pricing": "Pricing",
+    "blog": "Blog",
+    "about": "About Me",
+    "contact": "Contact",
+    "consult": "Get Consultation"
+  },
+  "hero": {
+    "badge": "Lian Design | Free Consultation",
+    "title1": "Build a Website That",
+    "title2": "Shocks Your Customers",
+    "description": "With custom design and impressive speed, create a website that leaves your competitors behind. WordPress or custom coding, the choice is yours.",
+    "freeConsult": "Free Consultation",
+    "portfolio": "Portfolio",
+    "projects": "Successful Projects",
+    "delivery": "Fast Delivery",
+    "satisfaction": "Client Satisfaction"
+  },
+  "services": {
+    "title": "Our Services",
+    "wordpress": {
+      "title": "WordPress Development",
+      "description": "Build professional websites with WordPress in the shortest time"
+    },
+    "custom": {
+      "title": "Custom Development",
+      "description": "Custom-coded websites for special projects"
+    },
+    "ecommerce": {
+      "title": "E-commerce",
+      "description": "Launch online stores with complete features"
+    },
+    "seo": {
+      "title": "SEO & Optimization",
+      "description": "Improve website ranking in search engines"
+    }
+  },
+  "footer": {
+    "copyright": "All rights reserved.",
+    "pages": "Pages",
+    "contactUs": "Contact Us"
+  },
+  "common": {
+    "learnMore": "Learn More",
+    "viewAll": "View All"
+  }
+}
