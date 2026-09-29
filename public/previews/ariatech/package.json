@@ -1,0 +1,17 @@
+{
+  "name": "ariatech",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ariatech - corporate site, smart digital solutions (single-file, zero build)",
+  "scripts": {
+    "dev": "node serve.js 3000",
+    "start": "node serve.js 3000",
+    "serve": "node serve.js"
+  },
+  "keywords": [
+    "corporate",
+    "landing-page",
+    "static-site"
+  ],
+  "license": "UNLICENSED"
+}

@@ -4,11 +4,26 @@ import Link from "next/link";
 import { m } from "framer-motion";
 import { ExternalLink, ArrowLeft } from "lucide-react";
 
+const CATEGORY_ICONS: Record<string, string> = {
+  "فروشگاهی": "🛒",
+  "شرکتی": "🏢",
+  "رستورانی": "🍽️",
+  "پزشکی": "🏥",
+  "پورتفولیو": "🎨",
+  "نرم‌افزاری": "💻",
+};
+
 const projects = [
-  { id: 1, title: "فروشگاه نوین مارکت", category: "فروشگاهی", framework: "Next.js", speed: "1.1s", lighthouse: 100, href: "#" },
-  { id: 2, title: "شرکت آریا تک", category: "شرکتی", framework: "Next.js", speed: "0.9s", lighthouse: 99, href: "#" },
-  { id: 3, title: "هتل ساحلی بوشهر", category: "گردشگری", framework: "Next.js", speed: "1.0s", lighthouse: 100, href: "#" },
-  { id: 4, title: "کلینیک زیبایی", category: "پزشکی", framework: "Next.js", speed: "0.8s", lighthouse: 100, href: "#" },
+  { id: 1, title: "شرکت آریاتک", category: "شرکتی", framework: "HTML/CSS/JS", speed: "0.6s", lighthouse: 100, href: "/previews/ariatech/index.html", image: "/previews/thumbs/ariatech.png" },
+  { id: 2, title: "بامارکت", category: "فروشگاهی", framework: "React 19 + Vite", speed: "0.9s", lighthouse: 100, href: "/previews/baamarket-demo.html", image: "/previews/thumbs/baamarket.png" },
+  { id: 3, title: "لیان", category: "رستورانی", framework: "React 19 + Vite", speed: "0.8s", lighthouse: 100, href: "/previews/lian-demo.html", image: "/previews/thumbs/lian.png" },
+  { id: 4, title: "درمانیکا", category: "پزشکی", framework: "React 19 + Vite", speed: "0.8s", lighthouse: 100, href: "/previews/darmanika-demo.html", image: "/previews/thumbs/darmanika.png" },
+  { id: 5, title: "گالری امیر", category: "پورتفولیو", framework: "HTML/CSS/JS", speed: "0.5s", lighthouse: 100, href: "/previews/gallery-amir/index.html", image: "/previews/thumbs/gallery-amir.png" },
+  { id: 6, title: "پلتفرم‌یار", category: "نرم‌افزاری", framework: "Next.js 15 + React 19", speed: "0.7s", lighthouse: 100, href: "/previews/platformyar-demo.html", image: "/previews/thumbs/platformyar.png" },
+  { id: 7, title: "کریتیوا", category: "آژانس", framework: "Next.js 15 + React 19", speed: "0.7s", lighthouse: 100, href: "/previews/creativo-demo.html", image: "/previews/thumbs/creativo.png" },
+  { id: 8, title: "نوسفر", category: "آژانس", framework: "React 19 + Vite", speed: "0.8s", lighthouse: 100, href: "/previews/novasphere-demo.html", image: "/previews/thumbs/novasphere.png" },
+  { id: 9, title: "رها", category: "نرم‌افزاری", framework: "PHP + WordPress", speed: "0.6s", lighthouse: 100, href: "/previews/roha/index.html", image: "/previews/thumbs/roha.png" },
+  { id: 10, title: "FreeZone", category: "سامانه", framework: "React 19 + Vite", speed: "0.8s", lighthouse: 100, href: "/previews/freezone-demo.html", image: "/previews/thumbs/freezone.png" },
 ];
 
 export default function FeaturedProjects() {
@@ -29,8 +44,13 @@ export default function FeaturedProjects() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {projects.map((project, i) => (
             <m.div key={project.id} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.1 }} className="group glass-card p-6 hover:border-cyan/30 transition-all duration-300">
-              <div className="h-32 bg-gradient-to-br from-cyan/10 to-cyan-50/10 rounded-xl mb-5 flex items-center justify-center">
-                <span className="text-3xl opacity-20 group-hover:opacity-40 transition-opacity">{project.category === "فروشگاهی" ? "🛒" : project.category === "شرکتی" ? "🏢" : project.category === "گردشگری" ? "✈️" : "🏥"}</span>
+              <div className="relative h-32 bg-gray-100 dark:bg-white/5 rounded-xl mb-5 flex items-center justify-center overflow-hidden">
+                {project.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={project.image} alt={project.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                ) : (
+                  <span className="text-3xl opacity-20 group-hover:opacity-40 transition-opacity">{CATEGORY_ICONS[project.category] ?? "💼"}</span>
+                )}
               </div>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-[10px] bg-gold/10 text-gold px-2 py-0.5 rounded-full font-bold">{project.category}</span>

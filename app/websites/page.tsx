@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ExternalLink, Eye } from "lucide-react";
+import { Eye } from "lucide-react";
 import WebsiteCard from "@/components/website/WebsiteCard";
 import AdSlot from "@/components/ads/AdSlot";
 import WebsiteFilters from "@/components/website/WebsiteFilters";
@@ -17,13 +17,30 @@ export const metadata: Metadata = {
   description: "نمونه‌کارها و سایت‌های آماده لیان دیزاین — پروژه‌های موفق و کاتالوگ سایت",
 };
 
+const CATEGORY_ICONS: Record<string, string> = {
+  "فروشگاهی": "🛒",
+  "شرکتی": "🏢",
+  "رستورانی": "🍽️",
+  "پزشکی": "🏥",
+  "پورتفولیو": "🎨",
+  "نرم‌افزاری": "💻",
+  "آژانس": "🎯",
+  "سامانه": "🗞️",
+  "گردشگری": "✈️",
+};
+
 const PORTFOLIO_PROJECTS = [
-  { id: 1, title: "فروشگاه نوین مارکت", category: "فروشگاهی", framework: "Next.js", speed: "1.1s", lighthouse: 100, href: "#" },
-  { id: 2, title: "شرکت آریا تک", category: "شرکتی", framework: "Next.js", speed: "0.9s", lighthouse: 99, href: "#" },
-  { id: 3, title: "هتل ساحلی بوشهر", category: "گردشگری", framework: "Next.js", speed: "1.0s", lighthouse: 100, href: "#" },
-  { id: 4, title: "کلینیک زیبایی", category: "پزشکی", framework: "Next.js", speed: "0.8s", lighthouse: 100, href: "#" },
-  { id: 5, title: "پورتفولیو طراح", category: "پورتفولیو", framework: "Next.js", speed: "0.7s", lighthouse: 100, href: "#" },
-  { id: 6, title: "فروشگاه مد و پوشاک", category: "فروشگاهی", framework: "Next.js", speed: "1.2s", lighthouse: 98, href: "#" },
+  { id: 1, title: "شرکت آریاتک", category: "شرکتی", framework: "HTML/CSS/JS", speed: "0.6s", lighthouse: 100, href: "/previews/ariatech/index.html", image: "/previews/thumbs/ariatech.png" },
+  { id: 2, title: "بامارکت", category: "فروشگاهی", framework: "React 19 + Vite", speed: "0.9s", lighthouse: 100, href: "/previews/baamarket-demo.html", image: "/previews/thumbs/baamarket.png" },
+  { id: 3, title: "لیان", category: "رستورانی", framework: "React 19 + Vite", speed: "0.8s", lighthouse: 100, href: "/previews/lian-demo.html", image: "/previews/thumbs/lian.png" },
+  { id: 4, title: "درمانیکا", category: "پزشکی", framework: "React 19 + Vite", speed: "0.8s", lighthouse: 100, href: "/previews/darmanika-demo.html", image: "/previews/thumbs/darmanika.png" },
+  { id: 5, title: "گالری امیر", category: "پورتفولیو", framework: "HTML/CSS/JS", speed: "0.5s", lighthouse: 100, href: "/previews/gallery-amir/index.html", image: "/previews/thumbs/gallery-amir.png" },
+  { id: 6, title: "پلتفرم‌یار", category: "نرم‌افزاری", framework: "Next.js 15 + React 19", speed: "0.7s", lighthouse: 100, href: "/previews/platformyar-demo.html", image: "/previews/thumbs/platformyar.png" },
+  { id: 7, title: "کریتیوا", category: "آژانس", framework: "Next.js 15 + React 19", speed: "0.7s", lighthouse: 100, href: "/previews/creativo-demo.html", image: "/previews/thumbs/creativo.png" },
+  { id: 8, title: "نوسفر", category: "آژانس", framework: "React 19 + Vite", speed: "0.8s", lighthouse: 100, href: "/previews/novasphere-demo.html", image: "/previews/thumbs/novasphere.png" },
+  { id: 9, title: "رها", category: "نرم‌افزاری", framework: "PHP + WordPress", speed: "0.6s", lighthouse: 100, href: "/previews/roha/index.html", image: "/previews/thumbs/roha.png" },
+  { id: 10, title: "FreeZone", category: "سامانه", framework: "React 19 + Vite", speed: "0.8s", lighthouse: 100, href: "/previews/freezone-demo.html", image: "/previews/thumbs/freezone.png" },
+  { id: 11, title: "TIDAMAX", category: "فروشگاهی", framework: "PHP + WordPress", speed: "0.7s", lighthouse: 100, href: "/portfolio/tidamax", image: "/previews/thumbs/tidamax.png" },
 ];
 
 const SORTS: WebsiteSort[] = ["newest", "popular", "price-asc", "price-desc"];
@@ -81,18 +98,34 @@ export default async function WebsitesPage({
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {PORTFOLIO_PROJECTS.map((project) => (
               <div key={project.id} className="group glass-card overflow-hidden">
-                <div className="relative h-48 bg-gradient-to-br from-cyan/10 to-cyan-50/10 flex items-center justify-center">
-                  <span className="text-4xl opacity-20 group-hover:opacity-40 transition-opacity">{project.category === "فروشگاهی" ? "🛒" : project.category === "شرکتی" ? "🏢" : project.category === "گردشگری" ? "✈️" : project.category === "پزشکی" ? "🏥" : "💼"}</span>
-                  <div className="absolute inset-0 bg-gradient-to-t from-obsidian to-transparent"></div>
-                  <div className="absolute bottom-4 left-4 right-4 flex gap-2">
-                    <Link href={project.href} className="flex-1 bg-cyan text-obsidian py-2 rounded-lg text-xs font-bold text-center hover:bg-cyan/90 transition-colors">
-                      <Eye size={12} className="inline ml-1" />
-                      مشاهده
-                    </Link>
-                    <Link href={project.href} className="flex-1 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white py-2 rounded-lg text-xs font-bold text-center hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">
-                      <ExternalLink size={12} className="inline ml-1" />
-                      لینک سایت
-                    </Link>
+                <div className="relative h-48 bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
+                  {project.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <span className="text-4xl opacity-20 group-hover:opacity-40 transition-opacity">{CATEGORY_ICONS[project.category] ?? "💼"}</span>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    {project.href !== "#" ? (
+                      <a
+                        href={project.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block w-full bg-cyan text-obsidian py-2.5 rounded-lg text-xs font-bold text-center hover:bg-cyan/90 transition-colors"
+                      >
+                        <Eye size={13} className="inline ml-1" />
+                        مشاهده زنده
+                      </a>
+                    ) : (
+                      <span className="block w-full bg-gray-200/80 dark:bg-white/10 text-gray-500 dark:text-white/50 py-2.5 rounded-lg text-xs font-bold text-center cursor-not-allowed">
+                        به‌زودی منتشر می‌شود
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="p-5">

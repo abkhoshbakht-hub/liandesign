@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" fill="none">
+  <!-- Swirl design -->
+  <g transform="translate(20, 10)">
+    <!-- Purple swirl -->
+    <path d="M40 80 C60 40, 100 20, 140 50" stroke="url(#purple)" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <circle cx="40" cy="80" r="6" fill="#9333EA"/>
+    <circle cx="140" cy="50" r="6" fill="#9333EA"/>
+    
+    <!-- Cyan swirl -->
+    <path d="M50 90 C70 50, 110 30, 150 60" stroke="url(#cyan)" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <circle cx="50" cy="90" r="6" fill="#06B6D4"/>
+    <circle cx="150" cy="60" r="6" fill="#06B6D4"/>
+    
+    <!-- Purple dot -->
+    <path d="M60 70 C80 30, 120 10, 160 40" stroke="url(#purple2)" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <circle cx="60" cy="70" r="6" fill="#A855F7"/>
+    <circle cx="160" cy="40" r="6" fill="#A855F7"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="200" y="85" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#C9A84C" text-anchor="middle">LIAN DESIGN</text>
+  <text x="200" y="110" font-family="Arial, sans-serif" font-size="14" fill="#C9A84C" text-anchor="middle">لیان دیزاین</text>
+  
+  <!-- Decorative lines -->
+  <line x1="60" y1="115" x2="180" y2="115" stroke="#C9A84C" stroke-width="1"/>
+  <line x1="220" y1="115" x2="340" y2="115" stroke="#C9A84C" stroke-width="1"/>
+  <circle cx="200" cy="115" r="3" fill="#C9A84C"/>
+  
+  <defs>
+    <linearGradient id="purple" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#A855F7"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0891B2"/>
+      <stop offset="100%" stop-color="#06B6D4"/>
+    </linearGradient>
+    <linearGradient id="purple2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#9333EA"/>
+      <stop offset="100%" stop-color="#C084FC"/>
+    </linearGradient>
+  </defs>
+</svg>

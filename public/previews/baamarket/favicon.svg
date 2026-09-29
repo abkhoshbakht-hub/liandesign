@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="baa_grad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E11D48"/>
+      <stop offset="0.5" stop-color="#DC2626"/>
+      <stop offset="1" stop-color="#D97706"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="18" fill="url(#baa_grad)"/>
+  <path d="M20 22C20 18.6863 22.6863 16 26 16H38C41.3137 16 44 18.6863 44 22V24H48C49.1046 24 50 24.8954 50 26L48 48C48 50.2091 46.2091 52 44 52H20C17.7909 52 16 50.2091 16 48L14 26C14 24.8954 14.8954 24 16 24H20V22Z" fill="white" fill-opacity="0.2"/>
+  <path d="M25 24V22C25 20.3431 26.3431 19 28 19H36C37.6569 19 39 20.3431 39 22V24" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  <path d="M18 25H46L44 47C44 48.6569 42.6569 50 41 50H23C21.3431 50 20 48.6569 20 47L18 25Z" fill="white"/>
+  <circle cx="28" cy="35" r="2.5" fill="#DC2626"/>
+  <circle cx="36" cy="35" r="2.5" fill="#DC2626"/>
+  <path d="M29 41C30.5 42.5 33.5 42.5 35 41" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M42 16L45 13M45 13L48 16M45 13V19" stroke="#FDE047" stroke-width="2" stroke-linecap="round"/>
+</svg>
