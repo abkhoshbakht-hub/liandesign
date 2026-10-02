@@ -142,20 +142,54 @@ model Product {
   name        String
   slug        String          @unique
   description String?
-  price       Int // تومان
+  price       Int // تومان — قیمت قالب
+  brandingPrice Int @default(0) // تومان — هزینه برندسازی و تحویل نهایی
   fileUrl     String? // لینک فایل تحویلی (مدیر بارگذاری می‌کند)
+  demoUrl     String? // لینک پیش‌نمایش زنده
+  images      String[] // اسکرین‌شات‌های محصول
+  includes    String[] // لیست محتویات فایل
+  license     String? // متن مجوز استفاده
   status      WebsiteStatus   @default(DRAFT)
   categoryId  String
   category    ProductCategory @relation(fields: [categoryId], references: [id])
   orderItems  OrderItem[]
   downloads   Download[]
   reviews     Review[]
+  brandingRequests BrandingRequest[]
   sponsoredItems CampaignItem[] @relation("SponsoredProducts")
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
 
   @@index([status])
   @@index([categoryId])
+}
+
+enum BrandingRequestStatus {
+  PENDING
+  IN_PROGRESS
+  DELIVERED
+  CANCELLED
+}
+
+model BrandingRequest {
+  id           String                @id @default(cuid())
+  productId    String
+  product      Product               @relation(fields: [productId], references: [id], onDelete: Cascade)
+  brandName    String
+  brandNameEn  String?
+  domain       String?
+  phone        String
+  email        String
+  logoUrl      String?
+  primaryColor String?
+  notes        String?
+  adminNote    String?
+  status       BrandingRequestStatus @default(PENDING)
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+
+  @@index([status])
+  @@index([productId])
 }
 
 model Download {
