@@ -25,12 +25,27 @@ const CATEGORY_ICONS: Record<string, string> = {
 
 // ── نمونه‌کارها: پروژه‌های اخیر (طراحی‌شده توسط لیان‌دیزاین) ──
 // delivered: پروژه تحویل‌شده به مشتری — قابل سفارش نسخه مشابه با برند جدید
-const PORTFOLIO_PROJECTS = [
-  { id: 1, title: "شرکت آریاتک", category: "شرکتی", framework: "HTML/CSS/JS", speed: "0.6s", lighthouse: 100, price: "۹ میلیون", hours: "۴۰ تا ۶۰ ساعت", href: "/previews/ariatech/index.html", image: "/previews/thumbs/ariatech.png", delivered: false },
+type PortfolioProject = {
+  id: number;
+  title: string;
+  category: string;
+  framework: string;
+  speed: string;
+  lighthouse: number;
+  price: string;
+  hours: string;
+  href: string;
+  demoNote?: string;
+  image: string;
+  delivered: boolean;
+};
+
+const PORTFOLIO_PROJECTS: PortfolioProject[] = [
+  { id: 1, title: "شرکت آریاتک", category: "شرکتی", framework: "HTML/CSS/JS", speed: "0.6s", lighthouse: 100, price: "۹ میلیون", hours: "۴۰ تا ۶۰ ساعت", href: "#", demoNote: "این پروژه به‌صورت قالب فروشی ارائه می‌شود — دموی زنده ارائه نمی‌شود", image: "/previews/thumbs/ariatech.png", delivered: false },
   { id: 2, title: "بامارکت", category: "فروشگاهی", framework: "React 19 + Vite", speed: "0.9s", lighthouse: 100, price: "۱۴ میلیون", hours: "۹۰ تا ۱۳۰ ساعت", href: "/previews/baamarket-demo.html", image: "/previews/thumbs/baamarket.png", delivered: false },
   { id: 3, title: "لیان", category: "رستورانی", framework: "React 19 + Vite", speed: "0.8s", lighthouse: 100, price: "۱۲ میلیون", hours: "۷۰ تا ۱۰۰ ساعت", href: "/previews/lian-demo.html", image: "/previews/thumbs/lian.png", delivered: false },
   { id: 4, title: "درمانیکا", category: "پزشکی", framework: "React 19 + Vite", speed: "0.8s", lighthouse: 100, price: "۱۲ میلیون", hours: "۸۰ تا ۱۱۰ ساعت", href: "/previews/darmanika-demo.html", image: "/previews/thumbs/darmanika.png", delivered: false },
-  { id: 5, title: "گالری امیر", category: "پورتفولیو", framework: "HTML/CSS/JS", speed: "0.5s", lighthouse: 100, price: "۹ میلیون", hours: "۳۰ تا ۵۰ ساعت", href: "/previews/gallery-amir/index.html", image: "/previews/thumbs/gallery-amir.png", delivered: false },
+  { id: 5, title: "گالری امیر", category: "پورتفولیو", framework: "HTML/CSS/JS", speed: "0.5s", lighthouse: 100, price: "۹ میلیون", hours: "۳۰ تا ۵۰ ساعت", href: "#", demoNote: "این پروژه به‌صورت قالب فروشی ارائه می‌شود — دموی زنده ارائه نمی‌شود", image: "/previews/thumbs/gallery-amir.png", delivered: false },
   { id: 6, title: "آرایه مدرن", category: "شرکتی", framework: "Next.js 15 + React 19", speed: "0.7s", lighthouse: 100, price: "۱۶ میلیون", hours: "۹۰ تا ۱۴۰ ساعت", href: "/previews/arayemodern-demo.html", image: "/previews/thumbs/arayemodern.png", delivered: true },
 ];
 
@@ -140,13 +155,13 @@ export default async function WebsitesPage({
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {PORTFOLIO_PROJECTS.map((project) => (
               <div key={project.id} className="group glass-card overflow-hidden">
-                <div className="relative h-48 bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
+<div className="relative h-64 bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
                   {project.image ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={project.image}
                       alt={project.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : (
                     <span className="text-4xl opacity-20 group-hover:opacity-40 transition-opacity">{CATEGORY_ICONS[project.category] ?? "💼"}</span>
@@ -164,8 +179,8 @@ export default async function WebsitesPage({
                         مشاهده زنده
                       </a>
                     ) : (
-                      <span className="block w-full bg-gray-200/80 dark:bg-white/10 text-gray-500 dark:text-white/50 py-2.5 rounded-lg text-xs font-bold text-center cursor-not-allowed">
-                        به‌زودی منتشر می‌شود
+<span className="block w-full bg-gray-200/80 dark:bg-white/10 text-gray-500 dark:text-white/50 py-2.5 px-2 rounded-lg text-[11px] font-bold text-center cursor-not-allowed leading-5">
+                        {project.demoNote ?? "به‌زودی منتشر می‌شود"}
                       </span>
                     )}
                   </div>
@@ -220,7 +235,7 @@ export default async function WebsitesPage({
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-14">
           {READY_SITES.map((site) => (
             <div key={site.id} className="group glass-card overflow-hidden flex flex-col">
-              <div className="relative h-44 bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
+              <div className="relative h-60 bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
                 {site.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img

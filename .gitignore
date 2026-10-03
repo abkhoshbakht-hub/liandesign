@@ -37,6 +37,20 @@ backup-excludes.txt
 # vercel
 .vercel
 
+# ===== NEVER COMMIT: paid template packages, DB dumps, private files =====
+*.zip
+*.dump
+*.sql.gz
+*.bak
+/private/
+/قالب‌های-فروشی/
+/private-downloads/
+/backups/
+*.env.production
+*.env.local
+# runtime user uploads (public dir is served as-is)
+public/uploads/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

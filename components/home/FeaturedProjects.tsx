@@ -14,11 +14,11 @@ const CATEGORY_ICONS: Record<string, string> = {
 };
 
 const projects = [
-  { id: 1, title: "شرکت آریاتک", category: "شرکتی", framework: "HTML/CSS/JS", speed: "0.6s", lighthouse: 100, href: "/previews/ariatech/index.html", image: "/previews/thumbs/ariatech.png" },
+  { id: 1, title: "شرکت آریاتک", category: "شرکتی", framework: "HTML/CSS/JS", speed: "0.6s", lighthouse: 100, href: "#", image: "/previews/thumbs/ariatech.png" },
   { id: 2, title: "بامارکت", category: "فروشگاهی", framework: "React 19 + Vite", speed: "0.9s", lighthouse: 100, href: "/previews/baamarket-demo.html", image: "/previews/thumbs/baamarket.png" },
   { id: 3, title: "لیان", category: "رستورانی", framework: "React 19 + Vite", speed: "0.8s", lighthouse: 100, href: "/previews/lian-demo.html", image: "/previews/thumbs/lian.png" },
   { id: 4, title: "درمانیکا", category: "پزشکی", framework: "React 19 + Vite", speed: "0.8s", lighthouse: 100, href: "/previews/darmanika-demo.html", image: "/previews/thumbs/darmanika.png" },
-  { id: 5, title: "گالری امیر", category: "پورتفولیو", framework: "HTML/CSS/JS", speed: "0.5s", lighthouse: 100, href: "/previews/gallery-amir/index.html", image: "/previews/thumbs/gallery-amir.png" },
+  { id: 5, title: "گالری امیر", category: "پورتفولیو", framework: "HTML/CSS/JS", speed: "0.5s", lighthouse: 100, href: "#", image: "/previews/thumbs/gallery-amir.png" },
   { id: 6, title: "پلتفرم‌یار", category: "نرم‌افزاری", framework: "Next.js 15 + React 19", speed: "0.7s", lighthouse: 100, href: "/previews/platformyar-demo.html", image: "/previews/thumbs/platformyar.png" },
   { id: 7, title: "کریتیوا", category: "آژانس", framework: "Next.js 15 + React 19", speed: "0.7s", lighthouse: 100, href: "/previews/creativo-demo.html", image: "/previews/thumbs/creativo.png" },
   { id: 8, title: "نوسفر", category: "آژانس", framework: "React 19 + Vite", speed: "0.8s", lighthouse: 100, href: "/previews/novasphere-demo.html", image: "/previews/thumbs/novasphere.png" },

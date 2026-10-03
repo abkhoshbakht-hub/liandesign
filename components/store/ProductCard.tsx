@@ -22,8 +22,10 @@ export default function ProductCard({
       ? `/api/ads/go?item=${adItemId}&to=${encodeURIComponent(`/store/${product.slug}`)}`
       : `/store/${product.slug}`;
 
-  // محصول واقعی = دمو و تصویر دارد | محصول در انتظار = هنوز آماده نیست
-  const isReady = Boolean(product.demoUrl);
+  // محصول واقعی = قابل سفارش است (دمو و تصویر دارد)
+  // دمو زنده اختیاری است؛ بعضی قالب‌ها عمداً فقط تصویر دارند تا سورسشان لو نرود.
+  const hasDemo = Boolean(product.demoUrl);
+  const isReady = hasDemo || (product.images?.length ?? 0) > 0 || (product.includes?.length ?? 0) > 0;
   const cover = product.images?.[0] ?? null;
   const total = product.price + (product.brandingPrice ?? 0);
 
@@ -33,7 +35,7 @@ export default function ProductCard({
         sponsored ? "border-gold/40" : ""
       }`}
     >
-      <div className="h-40 bg-gray-100 dark:bg-white/5 flex items-center justify-center relative overflow-hidden">
+      <div className="h-64 bg-gray-100 dark:bg-white/5 flex items-center justify-center relative overflow-hidden">
         {cover ? (
           <Image
             src={cover}
