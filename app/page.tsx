@@ -6,7 +6,6 @@ import PopularWebsites from "@/components/home/PopularWebsites";
 import AiTeaser from "@/components/home/AiTeaser";
 import Categories from "@/components/home/Categories";
 import HowItWorks from "@/components/home/HowItWorks";
-import FeaturedWebsites from "@/components/home/FeaturedWebsites";
 import WhyLian from "@/components/home/WhyLian";
 import CustomDesignBanner from "@/components/home/CustomDesignBanner";
 import DigitalTeaser from "@/components/home/DigitalTeaser";
@@ -32,7 +31,6 @@ export default function Home() {
       <AiTeaser />
       <Categories />
       <HowItWorks />
-      <FeaturedWebsites />
       <WhyLian />
       <CustomDesignBanner />
       <DigitalTeaser />
